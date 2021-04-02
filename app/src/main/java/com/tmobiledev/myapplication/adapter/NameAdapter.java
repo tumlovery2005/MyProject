@@ -20,7 +20,7 @@ import java.util.List;
 
 public class NameAdapter extends RecyclerView.Adapter<NameAdapter.NameViewHolder> {
     private Context context;
-    private ArrayList<NameModel> nameModelList = new ArrayList<>();
+    private List<NameModel> nameModelList = new ArrayList<>();
     private NameAdapterCallback nameAdapterCallback;
 
     public NameAdapter(Context context, NameAdapterCallback nameAdapterCallback){
@@ -39,13 +39,12 @@ public class NameAdapter extends RecyclerView.Adapter<NameAdapter.NameViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull NameAdapter.NameViewHolder holder, int position) {
-        NameViewHolder h = (NameViewHolder) holder;
-        h.setName(nameModelList.get(position));
-        h.checkBox_name.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        ((NameViewHolder) holder).setName(nameModelList.get(position));
+        ((NameViewHolder) holder).checkBox_name.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 nameModelList.get(position).setIsCheck(isChecked);
-                notifyItemChanged(position);
+//                notifyItemChanged(position);
                 nameAdapterCallback.onNameAdapterClickCheck(nameModelList.get(position), position);
             }
         });
@@ -53,7 +52,10 @@ public class NameAdapter extends RecyclerView.Adapter<NameAdapter.NameViewHolder
 
     @Override
     public int getItemCount() {
-        return nameModelList.size();
+        if(nameModelList != null){
+            return  nameModelList.size();
+        }
+        return 0;
     }
 
     public class NameViewHolder extends RecyclerView.ViewHolder {
@@ -76,17 +78,17 @@ public class NameAdapter extends RecyclerView.Adapter<NameAdapter.NameViewHolder
         nameModelList.add(new NameModel(
                 name, false
         ));
-        notifyDataSetChanged();
+        notifyItemInserted(nameModelList.size() - 1);
     }
 
     public void removeItem(){
-        List<NameModel> _nameModelList = nameModelList;
-        for(int i = 0;i < _nameModelList.size();i++){
-            if(_nameModelList.get(i).getIsCheck()){
-                _nameModelList.remove(i);
+        List<NameModel> _nameModelList = new ArrayList<>();
+        for(int i = 0;i < nameModelList.size();i++){
+            if(!nameModelList.get(i).getIsCheck()){
+                _nameModelList.add(nameModelList.get(i));
             }
         }
-        nameModelList.addAll(_nameModelList);
+        nameModelList = _nameModelList;
         notifyDataSetChanged();
     }
 
